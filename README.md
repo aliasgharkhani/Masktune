@@ -1,5 +1,5 @@
 <h1>MaskTune: Mitigating Spurious Correlations by Forcing to Explore</h1>
-This is an official pytorch implementation of [<em>MaskTune: Mitigating Spurious Correlations by Forcing to Explore</em>](https://duckduckgo.com), a NeurIPS 2022 paper. This work provides a technique for mitigating shortcut learning in machine learning algorithms.
+This is an official pytorch implementation of <a href="https://duckduckgo.com" target="_blank"><em>MaskTune: Mitigating Spurious Correlations by Forcing to Explore</em></a>, a NeurIPS 2022 paper. This work provides a technique for mitigating shortcut learning in machine learning algorithms.
 
 
 <h1>How to use</h1>
