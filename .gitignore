@@ -163,11 +163,7 @@ runs/
 datasets/
 !src/datasets/
 .vscode
-*.sh
 *.ipynb
 src/hyperparameter_search.py
 
 *.pdf
-
-src_1/*
-src_2/*
