@@ -1,4 +1,5 @@
 import torch
+import random
 
 from torch import Tensor
 from typing import List, Tuple
@@ -65,3 +66,42 @@ def add_color_bias_to_images(
                     target_i_data[:, :kwargs["square_size"], -kwargs["square_size"]:, j] = torch.ones((len(target_i_data), kwargs["square_size"], kwargs["square_size"])) * color[2-j]
         data[torch.where(targets==i)[0][:data_number_to_add_bias]] = target_i_data
     return data, np.array(colors)
+
+
+class Cutout(object):
+    """Randomly mask out one or more patches from an image.
+
+    Args:
+        n_holes (int): Number of patches to cut out of each image.
+        length (int): The length (in pixels) of each square patch.
+    """
+    def __init__(self, n_holes, lengths):
+        self.n_holes = n_holes
+        self.lengths = lengths
+
+    def __call__(self, img):
+        """
+        Args:
+            img (Tensor): Tensor image of size (C, H, W).
+        Returns:
+            Tensor: Image with n_holes of dimension length x length cut out of it.
+        """
+        c, h, w = img.size()
+        mask = np.ones((h, w), np.float32)
+
+        for n in range(self.n_holes):
+            y = np.random.randint(h)
+            x = np.random.randint(w)
+            length = random.choice(self.lengths)
+            y1 = np.clip(y - length // 2, 0, h)
+            y2 = np.clip(y + length // 2, 0, h)
+            x1 = np.clip(x - length // 2, 0, w)
+            x2 = np.clip(x + length // 2, 0, w)
+
+            mask[y1: y2, x1: x2] = 0.
+
+        mask = torch.from_numpy(mask)
+        mask = mask.expand_as(img)
+        img = img * mask
+
+        return img

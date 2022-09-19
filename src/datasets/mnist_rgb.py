@@ -32,7 +32,7 @@ class BiasedMNIST(MNIST):
             self.split = "train"
         else:
             self.split = "test"
-        img_data_dir = os.path.join(
+        self.img_data_dir = os.path.join(
             kwargs["root"],
             "BiasedMNIST",
             "images",
@@ -40,14 +40,14 @@ class BiasedMNIST(MNIST):
             bias_type,
         )
         if bias_type == "square":
-            img_data_dir = os.path.join(img_data_dir, square_number)
-        img_data_dir = os.path.join(img_data_dir, f"{round((1-bias_conflicting_data_ratio)*100)}")
-        bias_colors_file_path = os.path.join(img_data_dir, "bias_colors.npy")
-        if not (os.path.isdir(img_data_dir) and len(os.listdir(img_data_dir)) > 0):
+            self.img_data_dir = os.path.join(self.img_data_dir, str(square_number))
+        self.img_data_dir = os.path.join(self.img_data_dir, f"{round((1-bias_conflicting_data_ratio)*100)}")
+        bias_colors_file_path = os.path.join(self.img_data_dir, "bias_colors.npy")
+        if not (os.path.isdir(self.img_data_dir) and len(os.listdir(self.img_data_dir)) > 0):
             print(
                 f"\n\nstart creating and saving {self.split} dataset of BiasedMnist\n\n"
             )
-            os.makedirs(img_data_dir, exist_ok=True)
+            os.makedirs(self.img_data_dir, exist_ok=True)
             self.data, self.targets = filter_data_by_label(
                 self.data, self.targets, class_labels_to_filter
             )
@@ -69,10 +69,10 @@ class BiasedMNIST(MNIST):
                 )
                 np.save(bias_colors_file_path, self.bias_colors)
             for target in list(new_to_old_label_mapping.keys()):
-                os.makedirs(os.path.join(img_data_dir, str(target)), exist_ok=True)
+                os.makedirs(os.path.join(self.img_data_dir, str(target)), exist_ok=True)
             for id, (data, target) in enumerate(zip(self.data, self.targets)):
                 Image.fromarray(data.numpy().astype(np.uint8)).save(
-                    os.path.join(img_data_dir, str(target.item()), f"{id}.png")
+                    os.path.join(self.img_data_dir, str(target.item()), f"{id}.png")
                 )
             self.data = []
             self.targets = []
@@ -86,7 +86,7 @@ class BiasedMNIST(MNIST):
                 self.bias_colors = bias_colors
                 np.save(bias_colors_file_path, self.bias_colors)
 
-        self.update_data(img_data_dir)
+        self.update_data(self.img_data_dir)
             
     def update_data(self, data_file_directory, masked_data_file_directory=None):
         self.data_path = []
@@ -128,8 +128,7 @@ class BiasedMNIST(MNIST):
         """
         img, img_file_path, target = self.data[index], self.data_path[index], self.targets[index]
         if self.transform is not None:
-            transform = transforms.Compose([transforms.ToTensor()])
-            img = transform(img)
+            img = self.transform(img)
         if self.target_transform is not None:
             target = self.target_transform(target)
         if self.return_masked:

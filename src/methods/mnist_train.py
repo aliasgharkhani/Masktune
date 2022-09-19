@@ -1,6 +1,7 @@
 from copy import deepcopy
 from src.methods.base_method import TrainBaseMethod
 from src.datasets import BiasedMNIST
+from src.utils import Cutout
 from numpy.random import default_rng
 
 import torchvision.transforms as transforms
@@ -34,8 +35,7 @@ class MnistTrain(TrainBaseMethod):
         )
 
         self.val_dataset = deepcopy(self.train_dataset)
-        val_data_dir = os.path.join(
-            self.args.base_dir, "datasets", "BiasedMNIST", 'images', "val", self.args.bias_type, f"{round((1-self.args.train_bias_conflicting_data_ratio)*100)}")
+        val_data_dir = self.train_dataset.img_data_dir.replace("train", "val")
         if not (os.path.isdir(val_data_dir) and len(os.listdir(val_data_dir)) > 0):
             
             os.makedirs(val_data_dir, exist_ok=True)
@@ -49,17 +49,19 @@ class MnistTrain(TrainBaseMethod):
                 new_file_path = os.path.join(
                     val_data_dir, str(target), file_path.split("/")[-1])
                 os.replace(file_path, new_file_path)
-
-            train_data_dir = os.path.join(
-                self.args.base_dir, "datasets", "BiasedMNIST", 'images', "train", self.args.bias_type, f"{round((1-self.args.train_bias_conflicting_data_ratio)*100)}")
-            self.train_dataset.update_data(train_data_dir)
+            self.train_dataset.update_data(self.train_dataset.img_data_dir)
             self.val_dataset.update_data(val_data_dir)
         else:
             self.val_dataset.update_data(val_data_dir)
+        if self.args.use_random_masking:
+            data_to_mask_transform = transforms.Compose(
+            [transforms.ToTensor(), Cutout(1, [i for i in range(2, 15)])])
+        else:
+            data_to_mask_transform = self.transform_train
         self.data_to_mask_dataset = BiasedMNIST(
             root=os.path.join(self.args.base_dir, "datasets"),
             train=True,
-            transform=self.transform_train,
+            transform=data_to_mask_transform,
             download=True,
             class_labels_to_filter=[i for i in range(0, 10)],
             new_to_old_label_mapping={

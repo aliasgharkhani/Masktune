@@ -34,7 +34,7 @@ def main(args):
             if args.selective_classification:
                 method.test_selective_classification(erm_model_checkpoint_path=method.best_erm_model_checkpoint_path, finetuned_model_checkpoint_path=method.finetuned_model_checkpoint_path)
             else:
-                method.test(method.best_erm_model_checkpoint_path)
+                method.test(method.finetuned_model_checkpoint_path)
         else:
             method.train_erm()
             method.test(method.best_erm_model_checkpoint_path)

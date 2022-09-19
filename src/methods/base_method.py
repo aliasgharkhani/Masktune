@@ -86,7 +86,7 @@ class TrainBaseMethod(ABC):
         model_save_dir = os.path.join(self.run_dir, "checkpoints")
         os.makedirs(model_save_dir, exist_ok=True)
         self.model_save_dir = model_save_dir
-        masked_data_save_dir = os.path.join(self.run_dir, "masked_data")
+        masked_data_save_dir = os.path.join(self.run_dir, "masked_data", "1")
         os.makedirs(masked_data_save_dir, exist_ok=True)
         self.masked_data_save_dir = masked_data_save_dir
         self.best_erm_model_checkpoint_path = os.path.join(self.model_save_dir, "best_erm_model_checkpoint.pt")
@@ -319,7 +319,7 @@ class TrainBaseMethod(ABC):
             )
 
 
-    def finetune(self, use_lr_scheduler: bool=True, erm_checkpoint_path: str=None) -> None:
+    def finetune(self, use_lr_scheduler: bool=True, erm_checkpoint_path: str=None, use_random_masking: bool=False) -> None:
         assert erm_checkpoint_path is not None, "erm checkpoint should be passed to the finetune function!"        
         self.logger.info(
             "-" *
@@ -339,8 +339,11 @@ class TrainBaseMethod(ABC):
             lr_scheduler=self.lr_scheduler,
             checkpoint_path=erm_checkpoint_path
         )
+        data_loader=self.train_loader
+        if use_random_masking:
+            data_loader = self.data_to_mask_loader
         self.run_an_epoch(
-            data_loader=self.train_loader, epoch=0, mode=Mode.train)
+            data_loader=data_loader, epoch=0, mode=Mode.train)
         val_accuracy = self.run_an_epoch(
             data_loader=self.val_loader, epoch=0, mode=Mode.val
         )
@@ -370,23 +373,45 @@ class TrainBaseMethod(ABC):
                 self.logger.info(
                     "-"*10 + f"using masked data from saved data dir" + "-"*10, print_msg=True)
                 self.masked_data_save_dir = self.args.saved_mask_dir
-                self.best_erm_model_checkpoint_path = self.args.best_erm_model_checkpoint_path
+                shutil.copyfile(self.args.best_erm_model_checkpoint_path, self.best_erm_model_checkpoint_path)
+                shutil.copyfile(self.args.last_erm_model_checkpoint_path, self.last_erm_model_checkpoint_path)
                 data_is_complete = True
 
         return data_is_complete
+    
+    def random_mask(self):
+        self.train_erm(best_resume_checkpoint_path=self.args.best_erm_model_checkpoint_path, last_resume_checkpoint_path=self.args.last_erm_model_checkpoint_path)
+        self.test(checkpoint_path=self.best_erm_model_checkpoint_path)
+        self.finetune(use_lr_scheduler=False, erm_checkpoint_path=self.last_erm_model_checkpoint_path, use_random_masking=True)
 
     def masktune(self) -> None:
-        masked_data_is_ready = self.check_and_load_saved_masks(self.args.saved_mask_dir)
+        if self.args.masktune_iterations == 1:
+            masked_data_is_ready = self.check_and_load_saved_masks(self.args.saved_mask_dir)
+        else:
+            masked_data_is_ready = False
         if masked_data_is_ready:
             self.test(checkpoint_path=self.best_erm_model_checkpoint_path)
         else:
             self.train_erm(best_resume_checkpoint_path=self.args.best_erm_model_checkpoint_path, last_resume_checkpoint_path=self.args.last_erm_model_checkpoint_path)
             self.test(checkpoint_path=self.best_erm_model_checkpoint_path)
-            self.mask_data(erm_checkpoint_path=self.best_erm_model_checkpoint_path)
+            if not self.args.use_random_masking:
+                self.mask_data(erm_checkpoint_path=self.best_erm_model_checkpoint_path)
 
-        self.train_dataset, self.train_loader = update_dataset_and_dataloader(
-            self.train_dataset, data_dir=self.masked_data_save_dir, batch_size=self.args.train_batch, workers=self.args.workers)
-        self.finetune(use_lr_scheduler=False, erm_checkpoint_path=self.last_erm_model_checkpoint_path)
+        if not self.args.use_random_masking:
+            self.train_dataset, self.train_loader = update_dataset_and_dataloader(
+                self.train_dataset, data_dir=self.masked_data_save_dir, batch_size=self.args.train_batch, workers=self.args.workers)
+        self.finetune(use_lr_scheduler=False, erm_checkpoint_path=self.last_erm_model_checkpoint_path, use_random_masking=self.args.use_random_masking)
+        for i in range(self.args.masktune_iterations-1):
+            if self.args.accumulative_masking:
+                self.data_to_mask_dataset, self.data_to_mask_loader = update_dataset_and_dataloader(
+                    self.data_to_mask_dataset, data_dir=self.masked_data_save_dir, batch_size=self.args.masking_batch_size, workers=self.args.workers)
+            masked_data_save_dir = os.path.join(self.run_dir, "masked_data", str(i+2))
+            os.makedirs(masked_data_save_dir, exist_ok=True)
+            self.masked_data_save_dir = masked_data_save_dir
+            self.mask_data(erm_checkpoint_path=self.finetuned_model_checkpoint_path)
+            self.train_dataset, self.train_loader = update_dataset_and_dataloader(
+                self.train_dataset, data_dir=self.masked_data_save_dir, batch_size=self.args.train_batch, workers=self.args.workers)
+            self.finetune(use_lr_scheduler=False, erm_checkpoint_path=self.finetuned_model_checkpoint_path)
 
 
     def mask_data(self, erm_checkpoint_path: str=None):

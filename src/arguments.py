@@ -179,16 +179,27 @@ def add_test_args(parser: ArgumentParser) -> ArgumentParser:
     return parser
 
 
-def add_augmask_args(parser: ArgumentParser) -> ArgumentParser:
+def add_masktune_args(parser: ArgumentParser) -> ArgumentParser:
     parser.add_argument(
         "--masking_batch_size",
         type=int,
         default=128,
     )
+    parser.add_argument(
+        "--masktune_iterations",
+        type=int,
+        default=1,
+        choices=[1, 2, 3],
+    )
+    parser.add_argument(
+        "--accumulative_masking",
+        action="store_true",
+        default=False,
+    )    
     return parser
 
 
-def biased_mnist_args(parser: ArgumentParser) -> ArgumentParser:
+def add_biased_mnist_args(parser: ArgumentParser) -> ArgumentParser:
     parser.add_argument(
         "--square_number",
         default=1,
@@ -205,7 +216,7 @@ def biased_mnist_args(parser: ArgumentParser) -> ArgumentParser:
     return parser
 
 
-def selective_classification_args(parser: ArgumentParser) -> ArgumentParser:
+def add_selective_classification_args(parser: ArgumentParser) -> ArgumentParser:
     parser.add_argument(
         "--coverage",
         type=int,
@@ -215,6 +226,14 @@ def selective_classification_args(parser: ArgumentParser) -> ArgumentParser:
     )
     return parser
 
+def add_random_mask_args(parser: ArgumentParser) -> ArgumentParser:
+    parser.add_argument(
+        "--use_random_masking",
+        action="store_true",
+        default=False
+    )
+
+    return parser
 
 def init_train_argparse() -> ArgumentParser:
     parser = ArgumentParser(description="PyTorch MaskTune training")
@@ -223,7 +242,8 @@ def init_train_argparse() -> ArgumentParser:
     parser = add_optimizer_args(parser)
     parser = add_train_args(parser)
     parser = add_test_args(parser)
-    parser = add_augmask_args(parser)
-    parser = biased_mnist_args(parser)
-    parser = selective_classification_args(parser)
+    parser = add_masktune_args(parser)
+    parser = add_random_mask_args(parser)
+    parser = add_biased_mnist_args(parser)
+    parser = add_selective_classification_args(parser)
     return parser
