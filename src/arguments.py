@@ -38,16 +38,6 @@ def add_basic_args(parser: ArgumentParser) -> ArgumentParser:
         choices=["resnet50", "resnet18", "resnet32", "small_cnn"],
     )
     parser.add_argument(
-        "--train_bias_conflicting_data_ratio",
-        type=float,
-        default=0.2,
-    )
-    parser.add_argument(
-        "--test_bias_conflicting_data_ratio",
-        type=float,
-        default=1.0,
-    )
-    parser.add_argument(
         "--base_dir",
         type=str,
         metavar="PATH",
@@ -212,6 +202,16 @@ def add_biased_mnist_args(parser: ArgumentParser) -> ArgumentParser:
         default="square",
         choices=["square", "background", "foreground", "none"],
         help="type of bias to be injected into the MNIST data"
+    )
+    parser.add_argument(
+        "--train_bias_conflicting_data_ratio",
+        type=float,
+        default=0.2,
+    )
+    parser.add_argument(
+        "--test_bias_conflicting_data_ratio",
+        type=float,
+        default=1.0,
     )
     return parser
 

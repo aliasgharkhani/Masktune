@@ -1,6 +1,6 @@
 import copy
 import shutil
-from src.models import SmallCNN, ResNet50, resnet32
+from src.models import SmallCNN, ResNet50, resnet32, vgg16_bn
 from src.utils import (
     AverageMeter,
     calculate_accuracy,
@@ -152,6 +152,9 @@ class TrainBaseMethod(ABC):
                 pretrained=self.args.use_pretrained_weights, num_classes=model_size_configuration[self.args.dataset]['num_classes'])
         elif arch == 'resnet32':
             self.model = resnet32(pretrained=self.args.use_pretrained_weights, num_classes=model_size_configuration[self.args.dataset]['num_classes'])
+        elif arch == "vgg16_bn":
+            self.model = vgg16_bn(num_classes=model_size_configuration[self.args.dataset]['num_classes'],
+                                                     input_size=model_size_configuration[self.args.dataset]['input_size'], activation='relu')
         else:
             raise NotImplementedError()
         if multi_gpu:

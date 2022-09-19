@@ -1,16 +1,7 @@
-training the baseline for mnist:
-```
-python3 -m src.main --dataset mnist --train --arch small_cnn --base_dir /localhome/aka225/Research/AugMask_Project/AugMask_v1 --lr 0.00001 --use_cuda --square_percent 0.8 --log_images
-```
+This is an official pytorch implementation of [<em>MaskTune: Mitigating Spurious Correlations by Forcing to Explore</em>](https://duckduckgo.com), a NeurIPS 2022 paper. This work provides a technique for mitigating shortcut learning in machine learning algorithms.
 
-running iterative masking with mean masking:
 
-```
-python3 -m src.main --dataset mnist --train --arch small_cnn --base_dir /localhome/aka225/Research/AugMask_Project/AugMask_v1 --lr 0.00001 --use_cuda --square_percent 0.8 --iterative_masking --masking mean_mask --log_images
-```
-
-running iterative masking with sort masking:
-
-```
-python3 -m src.main --dataset mnist --train --arch small_cnn --base_dir /localhome/aka225/Research/AugMask_Project/AugMask_v1 --lr 0.00001 --use_cuda --square_percent 0.8 --iterative_masking --masking mean_mask --log_images --remove_k 100
-```
+1. clone the code (now you should have a folder named MaskTune)
+2. Inside `MaskTune/` create `datasets/` folder
+3. In `MaskTune/datasets/` create `catsvsdogs/raw/`, `CelebA/raw/`, `in9l/raw/`, and `Waterbirds/raw/` folders. (For other datasets (i.e., cifar10, mnist, and svhn) you don't need to do anything.)
+4. To run an experiment, use bash files which are in `MaskTune/bash_files`. First of all, change the second line of the bash file to the path of `MaskTune` folder (e.g., `downloads/MaskTune`). You have to set `base_dir` to the path of `MaskTune/` folder and `dataset_dir` to the path of corresponding dataset (e.g., for celebA set this to `{base_dir}/datasets/CelebA/raw`)
