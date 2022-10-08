@@ -55,7 +55,11 @@ model_size_configuration = {
     "celeba": {
         'num_classes': 2,
         'input_size': 224
-    }
+    },
+    "waterbirds": {
+        'num_classes': 2,
+        'input_size': 224
+    },
 }
 
 

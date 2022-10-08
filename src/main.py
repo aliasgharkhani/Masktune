@@ -8,6 +8,7 @@ from src.methods import (
     CelebATrain,
     CIFAR10Train,
     SVHNTrain,
+    WaterbirdsTrain
 )
 
 
@@ -26,6 +27,8 @@ def main(args):
         method = CIFAR10Train(args)
     elif args.dataset == "celeba":
         method = CelebATrain(args)
+    elif args.dataset == "waterbirds":
+        method = WaterbirdsTrain(args)
     else:
         raise NotImplementedError
     if args.train:

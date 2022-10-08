@@ -51,7 +51,7 @@ class WaterbirdsTrain(TrainBaseMethod):
         self.train_loader = torch.utils.data.DataLoader(
             self.train_dataset, batch_size=self.args.train_batch, shuffle=True, num_workers=self.args.workers)
         self.val_dataset = WaterbirdsDataset(raw_data_path=self.args.dataset_dir, root=os.path.join(
-            self.args.base_dir, 'datasets', 'Waterbirds'), split='val', transform=self.transform_test, return_places=self.args.use_worst_group_acc)
+            self.args.base_dir, 'datasets', 'Waterbirds'), split='val', transform=self.transform_test)
         self.data_to_mask_dataset = WaterbirdsDataset(raw_data_path=self.args.dataset_dir, root=os.path.join(
             self.args.base_dir, 'datasets', 'Waterbirds'), split='train', transform=self.transform_data_to_mask)
         self.val_loader = torch.utils.data.DataLoader(

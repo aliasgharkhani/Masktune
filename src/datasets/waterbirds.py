@@ -44,6 +44,7 @@ class WaterbirdsDataset(Dataset):
             os.makedirs(img_data_dir, exist_ok=True)
             with open(os.path.join(raw_data_path, 'metadata.csv')) as meta_file:
                 csv_reader = csv.reader(meta_file)
+                shutil.copy(os.path.join(raw_data_path, 'metadata.csv'), os.path.join(root, 'metadata.csv'))
                 for idx, row in enumerate(csv_reader):
                     if idx == 0:
                         continue
@@ -60,7 +61,7 @@ class WaterbirdsDataset(Dataset):
             print(
                 f"\n\nfinished creating {split} dataset of Waterbirds\n\n")
             return
-        with open(os.path.join(raw_data_path, 'metadata.csv')) as meta_file:
+        with open(os.path.join(root, 'metadata.csv')) as meta_file:
             csv_reader = csv.reader(meta_file)
             for idx, row in enumerate(csv_reader):
                 if idx == 0:
