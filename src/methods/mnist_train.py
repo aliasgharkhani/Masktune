@@ -18,8 +18,6 @@ class MnistTrain(TrainBaseMethod):
         self.transform_test = transforms.Compose([transforms.ToTensor()])
         self.transform_train = transforms.Compose(
             [transforms.ToTensor(), ])
-        self.transform_data_to_mask = transforms.Compose(
-            [transforms.ToTensor(), ])
 
         self.train_dataset = BiasedMNIST(
             root=os.path.join(self.args.base_dir, "datasets"),
@@ -54,14 +52,14 @@ class MnistTrain(TrainBaseMethod):
         else:
             self.val_dataset.update_data(val_data_dir)
         if self.args.use_random_masking:
-            data_to_mask_transform = transforms.Compose(
+            transform_data_to_mask = transforms.Compose(
             [transforms.ToTensor(), Cutout(1, [i for i in range(2, 15)])])
         else:
-            data_to_mask_transform = self.transform_train
+            transform_data_to_mask = self.transform_train
         self.data_to_mask_dataset = BiasedMNIST(
             root=os.path.join(self.args.base_dir, "datasets"),
             train=True,
-            transform=data_to_mask_transform,
+            transform=transform_data_to_mask,
             download=True,
             class_labels_to_filter=[i for i in range(0, 10)],
             new_to_old_label_mapping={

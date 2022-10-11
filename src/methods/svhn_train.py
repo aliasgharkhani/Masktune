@@ -20,7 +20,7 @@ class SVHNTrain(TrainBaseMethod):
             transforms.RandomCrop(32, padding=4),
             transforms.ToTensor()
         ])
-        self.transform_data_to_mask = transforms.Compose([
+        transform_data_to_mask = transforms.Compose([
             transforms.ToTensor(),
         ])
         self.train_dataset = SVHNDataset(root=os.path.join(
@@ -44,7 +44,7 @@ class SVHNTrain(TrainBaseMethod):
         train_sampler = SubsetRandomSampler(train_idx)
         val_sampler = SubsetRandomSampler(val_idx)
         self.data_to_mask_dataset = SVHNDataset(root=os.path.join(
-            self.args.base_dir, 'datasets', 'SVHN', 'raw'), split='train', transform=self.transform_data_to_mask, download=True)
+            self.args.base_dir, 'datasets', 'SVHN', 'raw'), split='train', transform=transform_data_to_mask, download=True)
 
         self.train_loader = torch.utils.data.DataLoader(
             self.train_dataset, batch_size=self.args.train_batch, sampler=train_sampler, shuffle=False, num_workers=self.args.workers)

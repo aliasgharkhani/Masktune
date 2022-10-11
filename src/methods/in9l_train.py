@@ -82,7 +82,7 @@ class IN9lTrain(TrainBaseMethod):
             transforms.Normalize([0.4717, 0.4499, 0.3837], [
                 0.2600, 0.2516, 0.2575]),
         ])
-        self.transform_data_to_mask = transforms.Compose([
+        transform_data_to_mask = transforms.Compose([
             transforms.Resize((224, 224)),
             transforms.ToTensor(),
             transforms.Normalize([0.4717, 0.4499, 0.3837], [
@@ -93,7 +93,7 @@ class IN9lTrain(TrainBaseMethod):
         self.val_dataset = IN9L(
             root=self.args.dataset_dir, split='val', transform=self.transform_test)
         self.data_to_mask_dataset = IN9L(
-            root=self.args.dataset_dir, split='train', transform=self.transform_data_to_mask)
+            root=self.args.dataset_dir, split='train', transform=transform_data_to_mask)
 
         self.train_loader = torch.utils.data.DataLoader(
             self.train_dataset, batch_size=self.args.train_batch, shuffle=True, num_workers=self.args.workers)

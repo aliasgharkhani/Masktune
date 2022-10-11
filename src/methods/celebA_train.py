@@ -38,7 +38,7 @@ class CelebATrain(TrainBaseMethod):
             transforms.ToTensor(),
             transforms.Normalize([0.485, 0.456, 0.406], [0.229, 0.224, 0.225])
         ])
-        self.transform_data_to_mask = transforms.Compose([
+        transform_data_to_mask = transforms.Compose([
             transforms.CenterCrop(orig_min_dim),
             transforms.Resize(target_resolution),
             transforms.ToTensor(),
@@ -49,7 +49,7 @@ class CelebATrain(TrainBaseMethod):
         self.val_dataset = CelebADataset(raw_data_path=self.args.dataset_dir, root=os.path.join(
             self.args.base_dir, 'datasets', 'CelebA'), split='val', transform=self.transform_test)
         self.data_to_mask_dataset = CelebADataset(raw_data_path=self.args.dataset_dir, root=os.path.join(
-            self.args.base_dir, 'datasets', 'CelebA'), split='train', transform=self.transform_data_to_mask)
+            self.args.base_dir, 'datasets', 'CelebA'), split='train', transform=transform_data_to_mask)
         self.train_loader = torch.utils.data.DataLoader(
             self.train_dataset, batch_size=self.args.train_batch, shuffle=True, num_workers=self.args.workers)
         self.val_loader = torch.utils.data.DataLoader(

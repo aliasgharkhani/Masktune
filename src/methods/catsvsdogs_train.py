@@ -21,7 +21,7 @@ class CatsVsDogsTrain(TrainBaseMethod):
             transforms.RandomAffine(degrees=15, translate=(0.1, 0.1)),
             transforms.ToTensor(),
         ])
-        self.transform_data_to_mask = transforms.Compose(
+        transform_data_to_mask = transforms.Compose(
             [transforms.ToTensor(), ])
             
         self.train_dataset = CatsVsDogsDataset(raw_data_path=self.args.dataset_dir, root=os.path.join(
@@ -46,7 +46,7 @@ class CatsVsDogsTrain(TrainBaseMethod):
         
         
         self.data_to_mask_dataset = CatsVsDogsDataset(raw_data_path=self.args.dataset_dir, root=os.path.join(
-            self.args.base_dir, 'datasets', 'catsvsdogs'), train=True, transform=self.transform_data_to_mask)
+            self.args.base_dir, 'datasets', 'catsvsdogs'), train=True, transform=transform_data_to_mask)
         
         self.train_loader = torch.utils.data.DataLoader(
             self.train_dataset, batch_size=self.args.train_batch, sampler=train_sampler, shuffle=False, num_workers=self.args.workers)

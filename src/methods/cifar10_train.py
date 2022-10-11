@@ -22,7 +22,7 @@ class CIFAR10Train(TrainBaseMethod):
                 transforms.ToTensor(),
             ]
         )
-        self.transform_data_to_mask = transforms.Compose(
+        transform_data_to_mask = transforms.Compose(
             [transforms.ToTensor(), ])
         self.train_dataset = CIFAR10Dataset(
             root=os.path.join(self.args.base_dir,
@@ -59,7 +59,7 @@ class CIFAR10Train(TrainBaseMethod):
             root=os.path.join(self.args.base_dir,
                                 "datasets", "CIFAR10", "raw"),
             train=True,
-            transform=self.transform_data_to_mask,
+            transform=transform_data_to_mask,
             download=True,
         )
         self.train_loader = torch.utils.data.DataLoader(

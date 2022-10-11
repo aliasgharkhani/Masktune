@@ -105,7 +105,10 @@ class BiasedMNIST(MNIST):
                 os.path.join(data_file_directory, data_class, "*")
             )
             for image_file_path in class_image_file_paths:
-                self.data.append(Image.open(image_file_path))
+                temp = Image.open(image_file_path)
+                keep = temp.copy()
+                self.data.append(keep)
+                temp.close()
             self.data_path += class_image_file_paths
             if masked_data_file_directory is not None:
                 self.return_masked = True
