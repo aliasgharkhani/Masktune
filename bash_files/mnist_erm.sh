@@ -1,11 +1,10 @@
 #!/bin/bash
-cd /localhome/aka225/Research/AugMask_Project/MaskTune/AugMask_v1
-source ../../AugMask_v1/augmask_venv/bin/activate
+cd path/to/the/cloned/folder
 
 python3 -m src.main --dataset mnist \
                     --train \
                     --arch small_cnn \
-                    --base_dir /localhome/aka225/Research/AugMask_Project/MaskTune/AugMask_v1 \
+                    --base_dir path/to/the/cloned/folder \
                     --lr 0.01 \
                     --use_cuda \
                     --optimizer sgd \
