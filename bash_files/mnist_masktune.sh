@@ -1,4 +1,6 @@
 #!/bin/bash
+cd path/to/the/cloned/folder
+
 
 python3 -m src.main --dataset mnist \
                     --train \
