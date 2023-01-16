@@ -3,11 +3,12 @@ cd path/to/the/cloned/folder
 
 python3 -m src.main --dataset svhn \
                     --train \
-                    --arch vgg16_bn \
+                    --arch resnet32 \
                     --base_dir path/to/the/cloned/folder \
                     --lr 0.1 \
                     --weight_decay 5e-4 \
-                    --schedule 50 100 150 200 250
+                    --gamma 0.5 \
+                    --schedule 25 50 75 100 125 150 175 200 225 250 275 \
                     --use_cuda \
                     --optimizer sgd \
                     --train_batch 128 \
